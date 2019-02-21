@@ -47,7 +47,7 @@ function a(BIN, Z, m1, sd1, m2, sd2, delta) #функция симуляции, 
             d2 = vcat(d2,d22)
 
             #Вторая проверка
-            if 2*cdf(TDist(n1+n2-2), (mean(d1) - mean(d2) - delta)/(sqrt(((n1-1)*var(d1)+(n2-1)*var(d2))/(n1+n2-2)*(1/n1+1/n2)))) < 0.05 num=num+1 end #если со второго раза получилось +1
+            if 2*cdf(TDist(n1+n2-2), (mean(d1) - mean(d2) + delta)/(sqrt(((n1-1)*var(d1)+(n2-1)*var(d2))/(n1+n2-2)*(1/n1+1/n2)))) < 0.05 num=num+1 end #если со второго раза получилось +1
         end
         d1 = nothing
         d2 = nothing
