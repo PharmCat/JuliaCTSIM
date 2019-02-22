@@ -35,11 +35,11 @@ function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5)
         d1 = Array{Float64, 1}(undef, n1)          #Выделение памяти под массивы d1, d2
         d2 = Array{Float64, 1}(undef, n2)
 
-        for i = 1:n1                               #Заполняем массив группы 1 данными субъектов с указанными значениями m, sd
-            d1[i] =  rand(Z)*sd1+m1
+        for i1 = 1:n1                               #Заполняем массив группы 1 данными субъектов с указанными значениями m, sd
+            d1[i1] =  rand(Z)*sd1+m1
         end
-        for i = 1:n2                               #Тоже самое для группы 2 (значения m, sd другие)
-            d2[i] =  rand(Z)*sd2+m2
+        for i1 = 1:n2                               #Тоже самое для группы 2 (значения m, sd другие)
+            d2[i1] =  rand(Z)*sd2+m2
         end
         #cdf - плотность, TDist - распределения стьюдента, далее критическое значение t (можно разложить что бы было понятно) #Тест двухсторонний
         #if 2*cdf(TDist(length(d1)+length(d2)-2), (mean(d1) - mean(d2) + delta)/(sqrt(((length(d1)-1)*var(d1)+(length(d2)-1)*var(d2))/(length(d1)+length(d2)-2)*(1/length(d1)+1/length(d2))))) < 0.05
@@ -53,11 +53,11 @@ function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5)
             d21 = Array{Float64, 1}(undef, n1)     #Также выделям массивы для элементов добора
             d22 = Array{Float64, 1}(undef, n2)
 
-            for i = 1:n1                           #Заполняем данными "добавку" для группы 1
-                d21[i] =  rand(Z)*sd1+m1
+            for i1 = 1:n1                           #Заполняем данными "добавку" для группы 1
+                d21[i1] =  rand(Z)*sd1+m1
             end
-            for i = 1:n2                           #Для группы 2
-                d22[i] =  rand(Z)*sd2+m2
+            for i1 = 1:n2                           #Для группы 2
+                d22[i1] =  rand(Z)*sd2+m2
             end
             append!(d1,d21)                        #Добавляем к предыдущим данным новые
             append!(d2,d22)
