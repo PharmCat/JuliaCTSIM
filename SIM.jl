@@ -1,4 +1,4 @@
-using Distributions, Random, Distributed
+using Distributions, Random, Distributed, Plots
 rng = MersenneTwister(1234);                       #Закоментировать для стационарного сида
 Random.seed!(rng)                                  #Закоментировать для стационарного сида
 BIN = Binomial(30, 0.9)                            #Биномиальное распределение N, P для симуляции числа субъектов
@@ -20,7 +20,7 @@ end
 
 #Power simulation 2 stage, 2 means
 #функция симуляции
-function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5)
+function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; alpha1=0.024, alpha2=0.025, log10n=5)
 
     n1::Int = 0
     n2::Int = 0
@@ -44,7 +44,7 @@ function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5)
         #cdf - плотность, TDist - распределения стьюдента, далее критическое значение t (можно разложить что бы было понятно) #Тест двухсторонний
         #if 2*cdf(TDist(length(d1)+length(d2)-2), (mean(d1) - mean(d2) + delta)/(sqrt(((length(d1)-1)*var(d1)+(length(d2)-1)*var(d2))/(length(d1)+length(d2)-2)*(1/length(d1)+1/length(d2))))) < 0.05
         #или с помощью вычисления ДИ d2-d1
-        if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), 0.040*2)[1] > delta
+        if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), alpha1*2)[1] > delta
             num=num+1                              #если (p < 0.05) нижняя граница ДИ > margin то считаем исследование удачным +1 к числу успехов
             p1 = p1 + 1                            #количество успехов этапа 1
         else                                       #Если нет, делаем "добор"
@@ -64,7 +64,7 @@ function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5)
 
             #Вторая проверка
             #if 2*cdf(TDist(length(d1)+length(d2)-2), (mean(d1) - mean(d2) + delta)/(sqrt(((length(d1)-1)*var(d1)+(length(d2)-1)*var(d2))/(length(d1)+length(d2)-2)*(1/length(d1)+1/length(d2))))) < 0.0499*2
-            if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), 0.02*2)[1] > delta
+            if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), alpha2*2)[1] > delta
                 num=num+1                          #если со второго раза получилось +1
                 p2 = p2 + 1                        #количество успехов этапа 2
             end
@@ -76,6 +76,28 @@ end
 
 
 #p1 = @async  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5.0)
-@time r = simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5.0)
+@time r = simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=4)
 print(r)
 #println(fetch(p1))
+redx = Array{Float64, 1}(undef,0)
+redy = Array{Float64, 1}(undef,0)
+bluex = Array{Float64, 1}(undef,0)
+bluey = Array{Float64, 1}(undef,0)
+for i=1:10000
+    global red
+    a1=round(rand()*0.05, digits=4)
+    a2=rand()*0.05
+    r = simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; alpha1=a1, alpha2=a2, log10n=4)
+    if r[1] < 5
+        push!(bluex, a1)
+        push!(bluey, a2)
+    else
+        push!(redx, a1)
+        push!(redy, a2)
+    end
+end
+
+
+plot(redx, redy,seriestype=:scatter,title="Alpha", marker = (:hexagon, 4, 0.6, :red, stroke(0)), legend=false)
+plot!(bluex, bluey, seriestype=:scatter,  marker = (:circle, 4, 0.6, :blue, stroke(0)))
+# png("plot1")
