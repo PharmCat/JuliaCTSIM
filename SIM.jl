@@ -1,5 +1,5 @@
 using Distributions, Random, Distributed, Plots
-rng = MersenneTwister(1234);                       
+rng = MersenneTwister(1234);                       #Сид
 Random.seed!(rng)                                  #Закоментировать для стационарного сида
 BIN = Binomial(30, 0.9)                            #Биномиальное распределение N, P для симуляции числа субъектов
 Z   = Normal()                                     #Нормальное распределение m= 0, sd = 1, для симуляции индивидуальных данных
@@ -32,48 +32,46 @@ function  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; alpha1=0.024, alpha2=0.
 
         n1  = rand(BIN)                            #Число субъектов группы 1
         n2  = rand(BIN)                            #Число субъектов группы 2
-        d1 = Array{Float64, 1}(undef, n1)          #Выделение памяти под массивы d1, d2
+        d1 = Array{Float64, 1}(undef, n1)          #Определение массивов d1, d2
         d2 = Array{Float64, 1}(undef, n2)
 
-        for i1 = 1:n1                               #Заполняем массив группы 1 данными субъектов с указанными значениями m, sd
+        for i1 = 1:n1                               #Заполнение массивов группы 1 данными субъектов с указанными значениями m, sd
             d1[i1] =  rand(Z)*sd1+m1
         end
-        for i1 = 1:n2                               #Тоже самое для группы 2 (значения m, sd другие)
+        for i1 = 1:n2                               #Тоже для группы 2 (значения m, sd другие)
             d2[i1] =  rand(Z)*sd2+m2
         end
-        #cdf - плотность, TDist - распределения стьюдента, далее критическое значение t (можно разложить что бы было понятно) #Тест двухсторонний
+        #cdf - плотность, TDist - распределения стьюдента, далее критическое значение t #Тест двухсторонний
         #if 2*cdf(TDist(length(d1)+length(d2)-2), (mean(d1) - mean(d2) + delta)/(sqrt(((length(d1)-1)*var(d1)+(length(d2)-1)*var(d2))/(length(d1)+length(d2)-2)*(1/length(d1)+1/length(d2))))) < 0.05
         #или с помощью вычисления ДИ d2-d1
         if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), alpha1*2)[1] > delta
-            num=num+1                              #если (p < 0.05) нижняя граница ДИ > margin то считаем исследование удачным +1 к числу успехов
-            p1 = p1 + 1                            #количество успехов этапа 1
+            num=num+1                              #Если (p < 0.05) нижняя граница ДИ > margin то считаем исследование удачным +1 к числу успехов
+            p1 = p1 + 1                            #Количество успехов этапа 1
         else                                       #Если нет, делаем "добор"
             n1  = rand(BIN)                        #На второй этап можно изменить объем выборки, для простоты используется значение выборки 1го этапа
             n2  = rand(BIN)
-            d21 = Array{Float64, 1}(undef, n1)     #Также выделям массивы для элементов добора
+            d21 = Array{Float64, 1}(undef, n1)     #Также определяются массивы для элементов добора
             d22 = Array{Float64, 1}(undef, n2)
 
-            for i1 = 1:n1                           #Заполняем данными "добавку" для группы 1
+            for i1 = 1:n1                          #Генерация данных для группы 1 этапа 2
                 d21[i1] =  rand(Z)*sd1+m1
             end
-            for i1 = 1:n2                           #Для группы 2
+            for i1 = 1:n2                          #Для группы 2
                 d22[i1] =  rand(Z)*sd2+m2
             end
-            append!(d1,d21)                        #Добавляем к предыдущим данным новые
+            append!(d1,d21)                        #Объединениеданных 1 и 2 этапов
             append!(d2,d22)
 
             #Вторая проверка
             #if 2*cdf(TDist(length(d1)+length(d2)-2), (mean(d1) - mean(d2) + delta)/(sqrt(((length(d1)-1)*var(d1)+(length(d2)-1)*var(d2))/(length(d1)+length(d2)-2)*(1/length(d1)+1/length(d2))))) < 0.0499*2
             if  meanDiffEV(mean(d2), var(d2), length(d2), mean(d1), var(d1), length(d1), alpha2*2)[1] > delta
-                num=num+1                          #если со второго раза получилось +1
-                p2 = p2 + 1                        #количество успехов этапа 2
+                num=num+1                          #Если на втором этапе успех +1 к количеству успешных исследований
+                p2 = p2 + 1                        #Количество успехов этапа 2
             end
         end
     end
-    return (num/itn*100), p1, p2                   #Количесво успешных делим на общее число, это будет мощность или альфа в зависимости от заданных начальных установок
+    return (num/itn*100), p1, p2                   #Количесво успешных исследований делится на общее число симуляций: мощность или альфа в зависимости от заданных начальных установок
 end
-
-
 
 #p1 = @async  simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=5.0)
 @time r = simP2st2Means(BIN, Z, m1, sd1, m2, sd2, delta; log10n=4)
@@ -83,6 +81,7 @@ redx = Array{Float64, 1}(undef,0)
 redy = Array{Float64, 1}(undef,0)
 bluex = Array{Float64, 1}(undef,0)
 bluey = Array{Float64, 1}(undef,0)
+#Симуляция инфляции alpha
 for i=1:10000
     global red
     a1=round(rand()*0.05, digits=4)
@@ -97,7 +96,7 @@ for i=1:10000
     end
 end
 
-
+#Визуализация
 plot(redx, redy,seriestype=:scatter,title="Alpha", marker = (:hexagon, 4, 0.6, :red, stroke(0)), legend=false)
 plot!(bluex, bluey, seriestype=:scatter,  marker = (:circle, 4, 0.6, :blue, stroke(0)))
 # png("plot1")
