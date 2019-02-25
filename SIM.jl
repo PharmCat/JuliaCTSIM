@@ -1,5 +1,5 @@
 using Distributions, Random, Distributed, Plots
-rng = MersenneTwister(1234);                       #Закоментировать для стационарного сида
+rng = MersenneTwister(1234);                       
 Random.seed!(rng)                                  #Закоментировать для стационарного сида
 BIN = Binomial(30, 0.9)                            #Биномиальное распределение N, P для симуляции числа субъектов
 Z   = Normal()                                     #Нормальное распределение m= 0, sd = 1, для симуляции индивидуальных данных
