@@ -18,8 +18,9 @@ f(x) = sum((a .- pk.(t, dose, x[1], x[2], x[3])) .^ 2)
 
 #Optimization f(x)
 o = optimize(f, [1.0, 0.001, 0.0001], method = NelderMead())
+#o2 = optimize(f, [1.0, 0.001, 0.0001], method = Newton())
 #Result
 r = Optim.minimizer(o)
 #Plotting
-plot(t, a)
+p = plot(t, a)
 plot!(time, pk.(time, dose, r[1], r[2], r[3]))
