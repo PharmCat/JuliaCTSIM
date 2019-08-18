@@ -1,7 +1,7 @@
 using DataFrames, CSV, StatsModels, Random,  ForwardDiff, LinearAlgebra, Optim, BenchmarkTools
 
 #THIS IS CASTOM SOLUTION FOR EDUCATION PURPOSE!!!
-
+ϝ
 mixdata = """subject,repeat,effect,response
 1,1,1,1
 1,2,1,1.1
@@ -92,6 +92,7 @@ function cov(G, R, Z)
 end
 """
     return β - fixed factor coefficients
+    β = (X'V⁻¹X)⁻¹X'V⁻¹y
 """
 function βcoef(y, X, iV)
     n = 6                     #because we have 6 subjects with equal X and V martices we make this cheating
@@ -108,6 +109,7 @@ end
     this function not includes X'X part because it is constant
     y, Z, X - is known
     θvec - unknown vector of variance components
+    𝐿(V, β, X, y) = (N-p)/2*log(2π) - log(|V|) - log(|X'V⁻¹X|) - (y-X*β)'V⁻¹(y-X*β)
 """
 function reml(y, Z, X, θvec)
     n = 6                                #do the same as in  βcoef
