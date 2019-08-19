@@ -1,7 +1,7 @@
 using DataFrames, CSV, StatsModels, Random,  ForwardDiff, LinearAlgebra, Optim, BenchmarkTools
 
 #THIS IS CASTOM SOLUTION FOR EDUCATION PURPOSE!!!
-ϝ
+
 mixdata = """subject,repeat,effect,response
 1,1,1,1
 1,2,1,1.1
