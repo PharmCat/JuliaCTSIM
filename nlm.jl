@@ -39,7 +39,6 @@ function newtongauss(fx, β0, y)
 #DiffResults.value(res) == fx(β0)
         e     = y-DiffResults.value(res)                      # yᵢ-f(x)
         sse   = sum(abs2, e)                                  # Σ(yᵢ-f(x))²
-
         #=QR
         qro   = qr(j)
         qy    = Array(qro.Q)' * e
@@ -49,8 +48,8 @@ function newtongauss(fx, β0, y)
         =#
 
         #Демиденко Е.З. Линейная и нелинейная регрессии М.: Финансы и статистика, 1981. стр. 245
-        q     = j'*e                 #q(x)/2
-        p     = inv(j'*j)*q                                # increment/decrement
+        #q     = j'*e                 #q(x)/2
+        p     = inv(j'*j)*j'*e                                # increment/decrement
         β0    = β0 .+ p
         cvg   = sum(abs2, p)
     end
